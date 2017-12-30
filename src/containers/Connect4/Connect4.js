@@ -25,40 +25,84 @@ class Connect4 extends Component {
   //       && this.state.board[column + 2][row] === this.state.board[column + 3][row])
   // }
 
-  checkForHorizontalWin(row, column) {
-    // checks if furthest left was placed
-    if (column < 4 && this.state.board[column][row] === this.state.board[column + 1][row]) {
-      if (this.state.board[column][row] === this.state.board[column + 1][row]
-        && this.state.board[column + 1][row] === this.state.board[column + 2][row]
-        && this.state.board[column + 2][row] === this.state.board[column + 3][row]) {
-          alert('You won!');
-
+  checkForDiagonalWin(row, column) {
+    let diagArray = [];
+    let col1 = column;
+    let r1 = row;
+    while (col1 > 0 && r1 < 5) {
+      col1--;
+      r1++;
+    }
+    while (col1 < column) {
+      diagArray.push(this.state.board[col1][r1]);
+      col1++;
+      r1--;
+    }
+    diagArray.push(this.state.board[column][row]);
+    let col = column;
+    let r = row + 1;
+    while (col < 6) {
+      col++;
+      r--;
+      diagArray.push(this.state.board[col][r - 1]);
+    }
+    let testWin = []
+    for (let i = 0; i < 4; i++) {
+      testWin = [diagArray[i], diagArray[i + 1], diagArray[i + 2], diagArray[i + 3]];
+      let isWin = testWin.filter(spot => spot === this.state.board[column][row]);
+      if (isWin.length === 4) {
+        alert('You won!');
+        this.resetGameHandler();
       }
     }
-    // checks if furthest right was placed
-    if (column > 2 && this.state.board[column][row] === this.state.board[column - 1][row]) {
-      if (this.state.board[column][row] === this.state.board[column - 1][row]
-        && this.state.board[column - 1][row] === this.state.board[column - 2][row]
-        && this.state.board[column - 2][row] === this.state.board[column - 3][row]) {
-          alert('You won!');
-      }
-    }
-    // checks if second from right was placed
-    if (column > 1 && column < 6 && this.state.board[column][row] === this.state.board[column - 1][row]) {
-      if (this.state.board[column + 1][row] === this.state.board[column][row]
-        && this.state.board[column][row] === this.state.board[column - 1][row]
-        && this.state.board[column - 1][row] === this.state.board[column - 2][row]) {
-          alert('You won!');
-      }
-    }
-    // checks if second from left was placed
-    if (column > 0 && column < 5 && this.state.board[column][row] === this.state.board[column - 1][row]) {
-      if (this.state.board[column + 1][row] === this.state.board[column][row]
-        && this.state.board[column + 2][row] === this.state.board[column][row]
-        && this.state.board[column - 1][row] === this.state.board[column][row]) {
-          alert('You won!');
-        }
   }
+
+  checkForBackwardsDiagonalWin(row, column) {
+    let diagArray = [];
+    let col1 = column;
+    let r1 = row;
+    while (col1 > 0 && r1 > 0) {
+      col1--;
+      r1--;
+    }
+    while (col1 < column) {
+      diagArray.push(this.state.board[col1][r1]);
+      col1++;
+      r1++;
+    }
+    diagArray.push(this.state.board[column][row]);
+    let col = column;
+    let r = row + 1;
+    while (col < 6) {
+      col++;
+      r++;
+      diagArray.push(this.state.board[col][r - 1]);
+    }
+    let testWin = []
+    for (let i = 0; i < 4; i++) {
+      testWin = [diagArray[i], diagArray[i + 1], diagArray[i + 2], diagArray[i + 3]];
+      let isWin = testWin.filter(spot => spot === this.state.board[column][row]);
+      if (isWin.length === 4) {
+        alert('You won!');
+        this.resetGameHandler();
+      }
+    }
+  }
+
+  checkForHorizontalWin(row, column) {
+    let rowArray = []
+    for (let col = 0; col < 7; col++) {
+      rowArray.push(this.state.board[col][row]);
+    }
+    let testWin = []
+    for (let i = 0; i < 4; i++) {
+      testWin = [rowArray[i], rowArray[i + 1], rowArray[i + 2], rowArray[i + 3]];
+      let isWin = testWin.filter(spot => spot === this.state.board[column][row]);
+      if (isWin.length === 4) {
+        alert('You won!');
+        this.resetGameHandler();
+      }
+    }
 }
 
 
@@ -68,6 +112,7 @@ class Connect4 extends Component {
       let isWin = columnArray.filter(item => this.state.board[column][item] === this.state.board[column][row - 1]);
       if (isWin.length === 4) {
         alert('You won!');
+        this.resetGameHandler();
       };
       // if (this.state.board[column][row - 1] === this.state.board[column][row]
       //   && this.state.board[column][row] === this.state.board[column][row + 1]
@@ -99,6 +144,8 @@ class Connect4 extends Component {
     }
     this.checkForVerticalWin(numberVacant, columnID);
     this.checkForHorizontalWin(numberVacant - 1, Number(columnID));
+    this.checkForDiagonalWin(numberVacant - 1, Number(columnID));
+    this.checkForBackwardsDiagonalWin(numberVacant - 1, Number(columnID));
   }
 
   resetGameHandler = () => {
